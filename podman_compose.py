@@ -1722,7 +1722,7 @@ class PodmanCompose:
             help="Specify a profile to enable",
             metavar="profile",
             action="append",
-            default=[]
+            default=[],
         )
         parser.add_argument(
             "-p",
