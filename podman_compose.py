@@ -1514,8 +1514,8 @@ class PodmanCompose:
         self.yaml_hash = hashlib.sha256(merged_json_b).hexdigest()
         compose["_dirname"] = dirname
         # debug mode
-        if len(files) > 1:
-            log(" ** merged:\n", json.dumps(compose, indent=2))
+        # if len(files) > 1:
+        #     log(" ** merged:\n", json.dumps(compose, indent=2))
         # ver = compose.get('version', None)
 
         if not project_name:
