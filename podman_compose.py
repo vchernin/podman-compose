@@ -1531,6 +1531,12 @@ class PodmanCompose:
         dir_basename = os.path.basename(dirname)
         self.dirname = dirname
 
+        profile = args.profile
+        if not profile:
+            profile_str = os.environ.get("COMPOSE_PROFILES", None)
+            if profile_str:
+                profile = profile_str.split(",")
+
         # env-file is relative to the CWD
         dotenv_dict = {}
         if args.env_file:
@@ -1556,6 +1562,7 @@ class PodmanCompose:
                 "COMPOSE_PROJECT_DIR": dirname,
                 "COMPOSE_FILE": pathsep.join(relative_files),
                 "COMPOSE_PATH_SEPARATOR": pathsep,
+                "COMPOSE_PROFILES": profile,
             }
         )
         compose = {}
@@ -1574,7 +1581,7 @@ class PodmanCompose:
                 content = rec_subs(content, self.environ)
                 rec_merge(compose, content)
         resolved_services = self._resolve_profiles(
-            compose.get("services", {}), set(args.profile)
+            compose.get("services", {}), set(profile)
         )
         compose["services"] = resolved_services
         self.merged_yaml = yaml.safe_dump(compose)
@@ -1608,7 +1615,7 @@ class PodmanCompose:
             services = {}
             log("WARNING: No services defined")
         # include services with no profile defined or the selected profiles
-        services = self._resolve_profiles(services, set(args.profile))
+        services = self._resolve_profiles(services, set(profile))
 
         # NOTE: maybe add "extends.service" to _deps at this stage
         flat_deps(services, with_extends=True)
