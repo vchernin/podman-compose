@@ -9,7 +9,6 @@
 
 # TODO: podman pod logs --color -n -f pod_testlogs
 
-
 import sys
 import os
 import getpass
@@ -1469,8 +1468,12 @@ class PodmanCompose:
         # TODO: remove next line
         os.chdir(dirname)
 
-        dotenv_path = os.path.join(dirname, args.env_file)
-        dotenv_dict = dotenv_to_dict(dotenv_path)
+        dotenv_dict = {}
+
+        for env_file in args.env_file:
+            dotenv_path = os.path.join(dirname, env_file)
+            dotenv_dict = {**dotenv_dict, **dotenv_to_dict(dotenv_path)}
+
         os.environ.update(
             {
                 key: value
@@ -1718,8 +1721,8 @@ class PodmanCompose:
             "--env-file",
             help="Specify an alternate environment file",
             metavar="env_file",
-            type=str,
-            default=".env",
+            action="append",
+            default=[".env"],
         )
         parser.add_argument(
             "-f",
