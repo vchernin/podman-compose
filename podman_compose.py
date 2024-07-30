@@ -1424,6 +1424,22 @@ class PodmanCompose:
     def _parse_compose_file(self):
         args = self.global_args
         # cmd = args.command
+
+        # load env into os object early
+        early_dirname = os.getcwd()
+        early_dotenv_dict = {}
+
+        for env_file in args.env_file:
+            dotenv_path = os.path.join(early_dirname, env_file)
+            early_dotenv_dict = {**early_dotenv_dict, **dotenv_to_dict(dotenv_path)}
+
+        os.environ.update(
+            {
+                key: value
+                for key, value in early_dotenv_dict.items()
+            }
+        )
+
         dirname = os.environ.get("COMPOSE_PROJECT_DIR", None)
         if dirname and os.path.isdir(dirname):
             os.chdir(dirname)
